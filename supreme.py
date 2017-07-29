@@ -1,5 +1,7 @@
-import requests, json, random, time, threading
+import requests, json, random, time, threading, datetime
+from fake_useragent import UserAgent
 
+ua = UserAgent()
 base_url = 'http://www.supremenewyork.com'
 
 # Classes to be used
@@ -70,3 +72,13 @@ class Account(object):
     def start_all_tasks(self):
         for task in (tasks for tasks in self.tasks if not tasks.active):
             task.toggle
+
+def log(event):
+    print(str(datetime.datetime.now().strftime('%H:%M:%S')) + ' ::: ' + str(event))
+
+# main method
+def main():
+    print("main")
+
+if __name__ == '__main__':
+    main()
