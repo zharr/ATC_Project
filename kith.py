@@ -8,7 +8,7 @@ ua = UserAgent()
 headers = {'User-Agent' : str(ua.random)}
 base_url = 'https://kith.com/'
 shop_url = 'https://shop.kithnyc.com'
-keywords = ['stance', 'crew', 'white']
+keywords = ['stance', 'classics', 'crew', 'white']
 size = 'OS'
 email = 'zach.harrison55@gmail.com'
 shipping_address = '15407 Elm Rd N'
@@ -81,18 +81,21 @@ def main():
             'id': id,
             'quantity': '1'
     }
+    time.sleep(2)
     r = session.post(base_url + '/cart/add.js', data=payload, headers=headers)
 
     # navigate to cart
+    time.sleep(2)
     r = session.get(base_url + '/cart', headers=headers)
 
     # navigate to checkout (need to pass token and utf character i think)
     print('Checking out...')
+    time.sleep(2)
     r = session.get(base_url + '/checkout', headers=headers)
 
     soup = bs(r.text, 'lxml')
     form = soup.find('form', {'class' : 'edit_checkout'})
-    time.sleep(.8)
+    time.sleep(2)
     payload = {
             'utf8': '✓',
             '_method': 'patch',
@@ -112,13 +115,14 @@ def main():
             # 'checkout[shipping_address][province]': ',,' + shipping_state,
             'checkout[shipping_address][zip]': shipping_zip,
             'checkout[shipping_address][phone]': phone_number,
-            # 'remember_me': 'false',
+            'remember_me': 'false',
             'checkout[client_details][browser_height]': '728',
             'checkout[client_details][browser_width]': '1280',
             'checkout[client_details][javascript_enabled]': '0',
             'step': 'shipping_method',
     }
 
+    time.sleep(2)
     r = session.post(shop_url + form['action'], data=payload, headers=headers)
 
     soup = bs(r.text, 'lxml')
@@ -137,6 +141,7 @@ def main():
             'utf8': '✓'
     }
 
+    time.sleep(2)
     r = session.post(shop_url + form['action'], data=payload, headers=headers)
 
     # r = session.get(shop_url + form['action'] + '?step=payment_method', headers=headers)
@@ -154,11 +159,13 @@ def main():
             'checkout[client_details][browser_height]': '728',
             'checkout[client_details][browser_width]': '1280',
             'checkout[client_details][javascript_enabled]': '1',
-            'checkout[credit_card][month]': card_exp_month,
+            'checkout[credit_card][expiry_month]': card_exp_month,
             'checkout[credit_card][name]': first_name + ' ' + last_name,
             'checkout[credit_card][number]': card_number,
             'checkout[credit_card][verification_value]': card_cvv,
+        # try getting rid of checkou[credit_card]
             'checkout[credit_card][year]': card_exp_year,
+            'checkout[credit_card][vault]': 'false',
             'checkout[different_billing_address]': 'false',
             'checkout[payment_gateway]': form.find('input', {'name': 'checkout[payment_gateway]'})['value'],
             'complete': '1',
@@ -168,11 +175,13 @@ def main():
             'step': '',
     }
 
+    time.sleep(2)
     response = session.post(shop_url + form['action'], data=payload, headers=headers)
     # print(r.text)
-    print(r.status_code)
-    print(r.url)
-    soup = bs(r.text, 'lxml')
+    print(response.status_code)
+    print(response.url)
+    print(response.text)
+    soup = bs(response.text, 'lxml')
     print('header: ' +str(soup.h2))
     with open('bs4.html', 'w') as f:
         for line in soup.prettify():
